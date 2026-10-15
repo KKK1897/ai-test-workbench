@@ -34,21 +34,6 @@ python -m venv .venv
 
 该模式是规则模板，不具备模型的语义理解能力，结果会明确标注“未调用模型”。
 
-### AI 模型生成
-
-停止已启动的服务，在**同一个 PowerShell 窗口**配置后重新启动：
-
-```powershell
-$env:AI_TEST_API_KEY="替换为你的密钥"
-$env:AI_TEST_API_BASE="https://api.deepseek.com/v1"
-$env:AI_TEST_MODEL="deepseek-chat"
-.\.venv\Scripts\python.exe -m qa_workbench.ai_testing.server
-```
-
-以上地址适用于 DeepSeek 官方 API；第三方兼容平台需要使用对应地址和模型名称。程序读取进程环境变量，不自动读取 `.env`，不要提交真实密钥。
-
-选择 AI 模式后，文档中识别出的需求文字会发送至配置的模型服务。首页仅显示是否读取到密钥，不代表认证已经成功。
-
 ## 使用流程
 
 1. 上传需求、接口说明或测试文档，并选择生成模式。
