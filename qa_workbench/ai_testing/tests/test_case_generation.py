@@ -75,7 +75,7 @@ class GenerationTests(unittest.TestCase):
 
 
 class HttpWorkflowTests(unittest.TestCase):
-    def test_upload_edit_review_and_download_no_model_or_erp(self):
+    def test_upload_edit_review_and_download_without_model_calls(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(server,'PROJECT_ROOT',Path(temp)), patch('qa_workbench.ai_testing.case_generator.generate') as model:
             httpd = server.ThreadingHTTPServer(('127.0.0.1',0),server.Handler)
             thread = threading.Thread(target=httpd.serve_forever,daemon=True); thread.start()

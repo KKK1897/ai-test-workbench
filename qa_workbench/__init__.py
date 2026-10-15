@@ -1,1 +1,1 @@
-"""AI test case workbench and ERP quality assurance suite."""
+"""Python test case generation and review workbench."""

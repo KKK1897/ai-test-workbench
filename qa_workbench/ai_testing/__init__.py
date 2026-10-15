@@ -1,1 +1,1 @@
-"""AI-assisted testing helpers for the local jshERP learning suite."""
+"""Document-based test case generation, review and export."""

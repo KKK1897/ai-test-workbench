@@ -10,7 +10,7 @@ venv/
 .idea/
 .vscode/
 
-# Downloaded ERP, tools, databases and runtime credentials
+# Local tools and runtime data
 /upstream/
 /tools/
 /runtime/
