@@ -1,41 +1,70 @@
-# AI 辅助测试工作台与 jshERP 自动化测试
+# AI 测试用例生成与评审工作台
 
-被测 ERP 来自开源 jshERP。本项目包含文档驱动的测试用例生成与评审工作台，以及既有进销存自动化回归测试，两者用途独立。
+Python 实现的文档驱动测试用例生成、人工评审和导出工具，同时保留接口、UI 与性能自动化测试示例。
 
-## Python 测试用例生成与评审
+## 功能
 
-上传 TXT、Markdown、DOCX、文字型 PDF，生成带需求来源的结构化测试点与测试用例；支持网页编辑审核，导出 XLSX、CSV、Markdown、JSON。默认本地规则模式，选用 AI 模式需配置模型密钥。生成内容尚未执行测试。
+- 上传 PDF、DOCX、TXT、Markdown，提取需求并生成结构化测试点与用例。
+- 关联需求原文及提取文本行号，校验字段、需求来源和需求覆盖。
+- 支持本地规则模板与配置模型的 AI 生成；两种模式明确区分。
+- 网页逐条编辑、审核，导出 Excel、CSV、Markdown、JSON。
+- 模型认证、额度、连接超时等错误有独立提示，不展示密钥。
 
-首次运行（仅文档生成工作台，无需启动 ERP / MySQL / Redis）：
+生成用例需人工审核，并不代表已执行测试。PDF 扫描件需要 OCR；需求筛查和模型语义判断仍有局限。
+
+## 快速启动
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-workbench.txt
-.\.venv\Scripts\python.exe -m beginner.ai_testing.server
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m qa_workbench.ai_testing.server
 ```
 
-打开 http://127.0.0.1:8765 。页面与业务处理由 Python 完成，无 JavaScript 或 Node.js 依赖。
+浏览器打开 http://127.0.0.1:8765 。工作台独立运行，无需 ERP、数据库或 Node.js。
 
-需要 AI 模型时，在启动服务前设置环境变量（以下默认使用 DeepSeek 官方服务；第三方平台需改地址与模型名称）：
+需要 AI 时，在同一 PowerShell 窗口、启动前配置：
 
 ```powershell
-$env:AI_TEST_API_KEY="替换为自己的密钥"
+$env:AI_TEST_API_KEY="你的密钥"
 $env:AI_TEST_API_BASE="https://api.deepseek.com/v1"
 $env:AI_TEST_MODEL="deepseek-chat"
 ```
 
-密钥不得提交；`.env.example` 仅是说明，程序不会自动加载 `.env`。
+默认地址适用于 DeepSeek 官方；其他平台请使用对应地址和模型。程序读取环境变量，不自动读取 `.env`。
 
-### 自动验证
+## 验证
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s beginner/ai_testing/tests -p "test_*.py" -v
+.\.venv\Scripts\python.exe -m unittest discover -s qa_workbench/ai_testing/tests -p "test_*.py" -v
 ```
 
-GitHub Actions 执行相同离线验证，模型响应使用替身，不需要 API 密钥，不访问 ERP。检查范围包括结构化生成、需求来源、响应校验、上传、编辑审核、导出和安全错误提示。
+GitHub Actions 运行同一组离线测试，模型使用模拟响应，不消耗 API 额度。
 
-详见 [用例生成工作台说明](beginner/docs/用例生成工作台说明.md)，可上传 [登录权限需求示例](beginner/docs/登录权限需求示例.md) 体验。
+## 目录
 
-## jshERP 测试
+```text
+qa_workbench/
+  ai_testing/        # 文档生成、评审、导出及对应验证
+  helpers/           # ERP 接口客户端与测试数据管理
+  tests/             # 接口、业务、权限和 UI 测试
+  performance/       # Locust 任务与负载组织
+  postman/           # 接口集合及环境示例
+support/             # ERP 锁与定向清理所需的工具
+docs/                # 必要业务规则、缺陷记录和使用说明
+.github/workflows/   # 离线验证 CI
+```
 
-既有接口、UI、库存和权限测试参见 [测试项目说明](beginner/README.md)。历史质量报告与产品缺陷证据保留在 docs 和 beginner/docs；用例生成不代表这些回归已通过。
+## ERP 自动化测试
+
+安装 `requirements-qa.txt` 后，可在已配置的隔离 jshERP 环境中执行 `python -m pytest`。这些用例不是无环境的单元测试；需先配置本机 ERP、Redis 验证码读取、测试身份及 `runtime/local.json`。执行会创建业务数据，失败现场默认留存。
+
+端口与配置要求见 [ERP 环境说明](docs/ERP环境说明.md)。本仓库不打包 ERP 源码、数据库、下载工具或本机凭据。
+
+## 文档
+
+- [工作台操作说明](docs/用例生成工作台说明.md)
+- [体验需求](docs/登录权限需求示例.md)
+- [业务规则与测试用例](docs/业务与测试用例.md)
+- [缺陷记录](docs/缺陷记录.md)
+
+被测 ERP 来源为 [jishenghua/jshERP](https://github.com/jishenghua/jshERP)，v3.5 / `7ca0f9d68fef761d98b00854d09e975eba291465`；ERP 本身不是本项目开发成果。历史缺陷与报告只针对该基线，不代表所有测试通过。原始复杂版本、归档、运行产物与上传文件均未纳入当前发布目录。
